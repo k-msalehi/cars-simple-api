@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  nginx:
+    image: nginx:1.23-alpine
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ../:/var/www/html
+      - ./log/:/var/log/nginx
+    networks:
+      - app_network
+    depends_on:
+      - app
+
+  mysql:
+    image: mysql:8.0-debian
+    volumes:
+      - db_volume:/var/lib/mysql
+    networks:
+      - app_network
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=laravel
+      - MYSQL_USER=laravel
+      - MYSQL_PASSWORD=secret
+
+  app:
+    image: gitlab.subra.ir:5050/automation/ci-cd/laravel-php-fpm
+    volumes:
+      - ../:/var/www/html
+    networks:
+      - app_network
+    command: ['php-fpm']
+    depends_on:
+      - mysql
+
+volumes:
+  db_volume:
+
+networks:
+  app_network:
+    driver: bridge
