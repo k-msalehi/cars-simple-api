@@ -53,26 +53,4 @@ class Handler extends ExceptionHandler
         });
     }
 
-    public function render($request, Throwable $exception)
-    {
-        // if ($request->expectsJson()) {
-        if ($request->is('api/*')) {
-            if ($exception instanceof ModelNotFoundException)
-                return app('res')->error('object not found', [], 404);
-
-            if ($exception instanceof AuthorizationException)
-                return app('res')->error('unauthorized.', [], 401);
-
-            if ($exception instanceof AuthenticationException)
-                return app('res')->error('Unauthenticated.', [], 401);
-
-            if ($exception instanceof AccessDeniedException)
-                return app('res')->error('Unauthorized.', [], 403);
-
-            if ($exception instanceof ValidationException)
-                return app('res')->error('validation error', $exception->validator->errors(), 422);
-        }
-
-        return parent::render($request, $exception);
-    }
 }

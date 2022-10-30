@@ -24,9 +24,9 @@ class CarUpdateReq extends FormRequest
     public function rules()
     {
         return [
-            'model' => ['required', 'string', 'max:255'],
-            'year' => ['required', 'numeric', 'min:1380', 'max:1401'],
-            'color' => ['required', 'in:white,black,blue,red'],
+            'model' => ['nullable', 'string', 'max:255'],
+            'year' => ['nullable', 'numeric', 'min:1380', 'max:1401'],
+            'color' => ['nullable', 'in:white,black,blue,red'],
         ];
     }
 }

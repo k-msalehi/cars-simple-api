@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CarStoreReq;
+use App\Http\Requests\CarUpdateReq;
+use App\Http\Resources\CarCollection;
+use App\Http\Resources\CarResource;
 use App\Models\Car;
+use App\Services\Response\Response;
 use Illuminate\Http\Request;
 
 class CarController extends Controller
@@ -12,9 +17,13 @@ class CarController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Response $res, Request $request)
     {
-        //
+        $perPage = $request->get('perPage', 25);
+        return  $res->success(
+            new CarCollection(Car::orderBy('id', 'DESC')->paginate($perPage)),
+            'Cars fetched successfully.'
+        );
     }
 
     /**
@@ -24,7 +33,6 @@ class CarController extends Controller
      */
     public function create()
     {
-        //
     }
 
     /**
@@ -33,9 +41,12 @@ class CarController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CarStoreReq $request, Response $res)
     {
-        //
+        if ($car = Car::create($request->validated()))
+            return $res->success(new CarResource($car), 'car created successfully.');
+        else
+            return $res->error('error while saving car');
     }
 
     /**
@@ -44,9 +55,9 @@ class CarController extends Controller
      * @param  \App\Models\Car  $car
      * @return \Illuminate\Http\Response
      */
-    public function show(Car $car)
+    public function show(Car $car, Response $res)
     {
-        //
+        return $res->success($car, 'Car fetched successfully.');
     }
 
     /**
@@ -67,9 +78,14 @@ class CarController extends Controller
      * @param  \App\Models\Car  $car
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Car $car)
-    {
-        //
+    public function update(CarUpdateReq $request, Response $res, Car $car)
+    {   
+        $car->model = $request->get('model', $car->model);
+        $car->year = $request->get('year', $car->year);
+        $car->color = $request->get('color', $car->color);
+        if ($car->save())
+            return $res->success($car, 'Car updated successfully.');
+        return $res->error('error while updating Car');
     }
 
     /**
@@ -78,8 +94,10 @@ class CarController extends Controller
      * @param  \App\Models\Car  $car
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Car $car)
+    public function destroy(Car $car, Response $res)
     {
-        //
+        if ($car->delete())
+            return $res->success($car, 'Car deleted successfully.');
+        return $res->error('error while deleting Car');
     }
 }
