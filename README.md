@@ -1,3 +1,5 @@
+*use Accept:application/json for requests*
+
 ## Cars API
 In this project you have to implement a REST full API for Car resource. Each car has the following properties:
 - ID : auto increment
